@@ -1,0 +1,11 @@
+---
+title: "repdata_peerassess1"
+author: "martin sneath"
+date: "12 November, 2014"
+output: html_document
+---
+Read the data in
+```{r}
+setwd("~/Documents/wp/r/repres")
+a=read.csv("activity.csv")
+```
