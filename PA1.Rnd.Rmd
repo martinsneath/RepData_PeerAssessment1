@@ -6,7 +6,6 @@ output: html_document
   
 ---
 
-
 ## Loading and preprocessing the data
 ```{r}
 a=read.csv("activity.csv")
@@ -48,8 +47,7 @@ sum(is.na(a))
 anew=a
 for (i in 1:nrow(anew)) {
      if (is.na(anew$steps[i])) {
-         anew$steps[i]=interval[match(anew$interval[i],interval[,1]),2]
-          
+         anew$steps[i]=interval[match(anew$interval[i],interval[,1]),2]         
      }
 }
 ```
@@ -63,8 +61,7 @@ mean(steps$Steps)
 median(steps$Steps)
 ```
 
-
-## Are there differences in activity patterns between weekdays and weekends?
+## Are there differences in activity patterns between weekdays and weekends? Yes
 
 ```{r}
 anew[,4]=as.character(length(anew))
@@ -80,6 +77,6 @@ weekend=anew[anew$day=="Weekend",]
 dmeans=tapply(weekday$steps,weekday$interval,mean)
 emeans=tapply(weekend$steps,weekend$interval,mean)
 par (mfrow=c(2,1))
-plot(dmeans,type="l",xlab="Interval",ylab="Steps")
-plot(emeans,type="l",xlab="Interval",ylab="Steps")
+plot(dmeans,type="l",main="Weekday Means",xlab="Interval",ylab="Steps")
+plot(emeans,type="l",main="Weekend Means",xlab="Interval",ylab="Steps")
 
