@@ -42,17 +42,44 @@ interval[which.max(interval$x),]
 sum(is.na(a))
 ```
 
-### Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. You could use the mean for that 5-minute interval, etc.
+### Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. You could use the mean for that 5-minute interval.
 
 ```{r}
 anew=a
 for (i in 1:nrow(anew)) {
      if (is.na(anew$steps[i])) {
-         anew$steps[i]=interval[match(anew$interval[i],interval),2]
+         anew$steps[i]=interval[match(anew$interval[i],interval[,1]),2]
           
      }
 }
+```
+### Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
 
+```{r}
+steps=aggregate(anew$steps,by=(list(anew$date)),FUN=sum)
+colnames(steps)=c("Date","Steps")
+hist(steps$Steps,main="",xlab="Total steps per day NA imputed to mean for interval")
+mean(steps$Steps)
+median(steps$Steps)
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+anew[,4]=as.character(length(anew))
+colnames(anew)[4]="day"
+for (i in 1:nrow(anew)){
+     if (weekdays(as.Date(as.character(anew$date[i])))=="Saturday" | weekdays(as.Date(as.character(anew$date[i]))) =="Sunday"){ anew$day[i] = "Weekend"}
+          else{anew$day[i]="Weekday"}
+   
+}
+
+weekday=anew[anew$day=="Weekday",]
+weekend=anew[anew$day=="Weekend",]
+dmeans=tapply(weekday$steps,weekday$interval,mean)
+emeans=tapply(weekend$steps,weekend$interval,mean)
+par (mfrow=c(2,1))
+plot(dmeans,type="l",xlab="Interval",ylab="Steps")
+plot(emeans,type="l",xlab="Interval",ylab="Steps")
+
