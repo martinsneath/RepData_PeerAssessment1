@@ -1,9 +1,8 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 author: "martin sneath"
-date: "For submission 2014/11/16"
+date: "For submission 2014/12"
 output: html_document
-  
 ---
 
 ## Loading and preprocessing the data
@@ -21,7 +20,7 @@ colnames(steps)=c("Date","Steps")
 hist(steps$Steps,main="",xlab="Total steps per day")
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+![plot of chunk mean steps day](figure/mean steps day-1.png) 
 
 ### Calculate and report the mean and median total number of steps taken per day
 
@@ -44,10 +43,11 @@ median(steps$Steps)
 
 ```r
 interval=aggregate(b$steps,by=(list(b$interval)),FUN=mean)
+
  plot(interval,type="l",xlab="Time (24 hour clock)",ylab="Mean number steps")
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
+![plot of chunk average daily activity](figure/average daily activity-1.png) 
 
 ### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -91,7 +91,7 @@ colnames(steps)=c("Date","Steps")
 hist(steps$Steps,main="",xlab="Total steps per day NA imputed to mean for interval")
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
+![plot of chunk histogram total steps per day](figure/histogram total steps per day-1.png) 
 
 ```r
 mean(steps$Steps)
@@ -113,6 +113,7 @@ median(steps$Steps)
 
 
 ```r
+# add a new day column to dataframe without nas
 anew[,4]=as.character(length(anew))
 colnames(anew)[4]="day"
 for (i in 1:nrow(anew)){
@@ -123,11 +124,26 @@ for (i in 1:nrow(anew)){
 
 weekday=anew[anew$day=="Weekday",]
 weekend=anew[anew$day=="Weekend",]
-dmeans=tapply(weekday$steps,weekday$interval,mean)
-emeans=tapply(weekend$steps,weekend$interval,mean)
+interval[,3]=tapply(weekday$steps,weekday$interval,mean)
+interval[,4]=tapply(weekend$steps,weekend$interval,mean)
+colnames(interval)=c("interval","meansteps","weekdaymean","weekendmean")
 par (mfrow=c(2,1))
-plot(dmeans,type="l",main="Weekday Means",xlab="Interval",ylab="Steps")
-plot(emeans,type="l",main="Weekend Means",xlab="Interval",ylab="Steps")
+plot(interval$interval,interval$weekdaymean,type="l",main="Weekday Means",xlab="Interval",ylab="Steps")
+plot(interval$interval,interval$weekendmean,type="l",main="Weekend Means",xlab="Interval",ylab="Steps")
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+![plot of chunk differences on weekends](figure/differences on weekends-1.png) 
+
+```r
+summary(interval[,3:4])
+```
+
+```
+##   weekdaymean       weekendmean     
+##  Min.   :  0.000   Min.   :  0.000  
+##  1st Qu.:  2.247   1st Qu.:  1.241  
+##  Median : 25.803   Median : 32.340  
+##  Mean   : 35.611   Mean   : 42.366  
+##  3rd Qu.: 50.854   3rd Qu.: 74.654  
+##  Max.   :230.378   Max.   :166.639
+```
