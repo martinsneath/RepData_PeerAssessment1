@@ -1,19 +1,18 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 author: "martin sneath"
-date: "For submission 2014/11/16"
+date: "For submission 2014/12"
 output: html_document
-  
 ---
 
 ## Loading and preprocessing the data
-```{r}
+```{r read data}
 a=read.csv("activity.csv")
 b=na.omit(a)
 ```
 ## What is mean total number of steps taken per day?
 ### Make a histogram of the total number of steps taken each day
-```{r}
+```{r mean steps day}
 steps=aggregate(b$steps,by=(list(b$date)),FUN=sum)
 colnames(steps)=c("Date","Steps")
 hist(steps$Steps,main="",xlab="Total steps per day")
@@ -25,25 +24,26 @@ mean(steps$Steps)
 median(steps$Steps)
 ```
 ## What is the average daily activity pattern?
-```{r}
+```{r average daily activity}
 interval=aggregate(b$steps,by=(list(b$interval)),FUN=mean)
+
  plot(interval,type="l",xlab="Time (24 hour clock)",ylab="Mean number steps")
 ```
 
 ### Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r}
+```{r maximum steps in 5 minute interval}
 interval[which.max(interval$x),]
 ```
 
 ## Imputing missing values
 ### Calculate and report the total number of missing values in the dataset 
-```{r}
+```{r sum missing values}
 sum(is.na(a))
 ```
 
 ### Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. You could use the mean for that 5-minute interval.
 
-```{r}
+```{r fill in missing values with mean for interval}
 anew=a
 for (i in 1:nrow(anew)) {
      if (is.na(anew$steps[i])) {
@@ -53,7 +53,7 @@ for (i in 1:nrow(anew)) {
 ```
 ### Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
 
-```{r}
+```{r histogram total steps per day}
 steps=aggregate(anew$steps,by=(list(anew$date)),FUN=sum)
 colnames(steps)=c("Date","Steps")
 hist(steps$Steps,main="",xlab="Total steps per day NA imputed to mean for interval")
@@ -63,7 +63,8 @@ median(steps$Steps)
 
 ## Are there differences in activity patterns between weekdays and weekends? Yes
 
-```{r}
+```{r differences on weekends}
+# add a new day column to dataframe without nas
 anew[,4]=as.character(length(anew))
 colnames(anew)[4]="day"
 for (i in 1:nrow(anew)){
@@ -74,9 +75,10 @@ for (i in 1:nrow(anew)){
 
 weekday=anew[anew$day=="Weekday",]
 weekend=anew[anew$day=="Weekend",]
-dmeans=tapply(weekday$steps,weekday$interval,mean)
-emeans=tapply(weekend$steps,weekend$interval,mean)
+interval[,3]=tapply(weekday$steps,weekday$interval,mean)
+interval[,4]=tapply(weekend$steps,weekend$interval,mean)
+colnames(interval)=c("interval","meansteps","weekdaymean","weekendmean")
 par (mfrow=c(2,1))
-plot(dmeans,type="l",main="Weekday Means",xlab="Interval",ylab="Steps")
-plot(emeans,type="l",main="Weekend Means",xlab="Interval",ylab="Steps")
-
+plot(interval$interval,interval$weekdaymean,type="l",main="Weekday Means",xlab="Interval",ylab="Steps")
+plot(interval$interval,interval$weekendmean,type="l",main="Weekend Means",xlab="Interval",ylab="Steps")
+summary(interval[,3:4])
